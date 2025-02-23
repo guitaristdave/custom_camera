@@ -50,6 +50,13 @@
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     z-index: 10;
   }
+
+  .switch-btn {
+    position: absolute; /* Привязывает кнопку к .camera-wrapper */
+    bottom: 30px;
+    left: 50%;
+    z-index: 10;
+  }
   
   .btn:hover {
     transform: translateX(-50%) scale(1.1);
@@ -86,18 +93,7 @@
     border-radius: 15px;
   }
 
-  .switch-btn {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 1rem;
-    border-radius: 50%;
-    cursor: pointer;
-    font-size: 1.2rem;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    z-index: 10;
-  }
+
   
   /* Мобильная версия */
   @media (max-width: 768px) {
