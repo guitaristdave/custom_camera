@@ -54,7 +54,7 @@
   .switch-btn {
     position: absolute; /* Привязывает кнопку к .camera-wrapper */
     bottom: 30px;
-    left: 50%;
+    left: 70%;
     z-index: 10;
   }
   
