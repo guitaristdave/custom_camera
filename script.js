@@ -14,7 +14,7 @@ const startCamera = async () => {
     stream.getTracks().forEach((track) => track.stop()); // Останавливаем предыдущий поток
   }
 
-  if (currentFacingMode == "environment") {
+  if (currentFacingMode !== "environment") {
     video.classList.add("mirror");
   } else {
     video.classList.remove("mirror");
