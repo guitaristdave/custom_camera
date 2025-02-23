@@ -32,6 +32,9 @@
     width: 800px;
     max-width: 100%;
     border-radius: 20px;
+  }
+
+  .mirror {
     transform: scaleX(-1);
   }
   
