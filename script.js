@@ -1,16 +1,23 @@
     const video = document.getElementById('video');
     const captureBtn = document.getElementById('captureBtn');
+    const switchBtn = document.getElementById('switchBtn');
     const gallerySection = document.getElementById('gallerySection');
     const galleryItems = document.getElementById('galleryItems');
     const generalPhoto = document.getElementById('generalPhoto');
 
     let stream = null;
     const gallery = [];
+    let currentFacingMode = 'environment'; // Старт с задней камеры
+
 
     const startCamera = async () => {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop()); // Останавливаем предыдущий поток
+      }
       try {
-        stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        stream = await navigator.mediaDevices.getUserMedia({ video: {facingMode: currentFacingMode }, audio: false });
         video.srcObject = stream;
+        await video.play();
       } catch (error) {
         console.error('Error accessing camera:', error);
       }
@@ -53,8 +60,12 @@
       });
     };
 
+    switchBtn.addEventListener('click', () => {
+      currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
+      startCamera(); // Перезапуск камеры с новым facingMode
+    });
+
     captureBtn.addEventListener('click', capturePhoto);
 
     window.addEventListener('DOMContentLoaded', startCamera);
     window.addEventListener('beforeunload', stopCamera);
-    console.log(stream)
