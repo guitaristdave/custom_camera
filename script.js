@@ -16,6 +16,7 @@
       }
     };
 
+
     const stopCamera = () => {
       if (stream) {
         stream.getTracks().forEach(track => track.stop());
@@ -56,3 +57,4 @@
 
     window.addEventListener('DOMContentLoaded', startCamera);
     window.addEventListener('beforeunload', stopCamera);
+    console.log(stream)
