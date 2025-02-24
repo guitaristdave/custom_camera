@@ -14,7 +14,8 @@ const startCamera = async () => {
   if (stream) {
     stream.getTracks().forEach((track) => track.stop()); // Останавливаем предыдущий поток
   }
-
+  console.log(stream);
+  console.log(currentFacingMode);
   try {
     stream = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: currentFacingMode },
@@ -71,6 +72,7 @@ const updateGallery = () => {
 switchBtn.addEventListener("click", () => {
   currentFacingMode =
     currentFacingMode === "environment" ? "user" : "environment";
+  console.log('switchBtn: ', currentFacingMode);
   startCamera(); // Перезапуск камеры с новым facingMode
 });
 
