@@ -1,4 +1,4 @@
-const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
 const captureBtn = document.getElementById("captureBtn");
 const switchBtn = document.getElementById("switchBtn");
 const gallerySection = document.getElementById("gallerySection");
@@ -8,24 +8,30 @@ const generalPhoto = document.getElementById("generalPhoto");
 let stream = null;
 const gallery = [];
 let currentFacingMode = "environment"; // Старт с задней камеры
+let ctx = canvas.getContext("2d");
 
 const startCamera = async () => {
   if (stream) {
     stream.getTracks().forEach((track) => track.stop()); // Останавливаем предыдущий поток
   }
 
-  if (currentFacingMode !== "environment") {
-    video.classList.add("mirror");
-  } else {
-    video.classList.remove("mirror");
-  }
   try {
     stream = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: currentFacingMode },
       audio: false,
     });
+    const video = document.createElement("video");
     video.srcObject = stream;
     await video.play();
+
+    const drawVideo = () => {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      requestAnimationFrame(drawVideo);
+    };
+
+    drawVideo();
   } catch (error) {
     console.error("Error accessing camera:", error);
   }
@@ -43,11 +49,6 @@ const setGeneralPhoto = (photoSrc) => {
 };
 
 const capturePhoto = () => {
-  const canvas = document.createElement("canvas");
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-  const ctx = canvas.getContext("2d");
-  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
   const dataUrl = canvas.toDataURL("image/jpeg");
   gallery.push(dataUrl);
   updateGallery();
