@@ -1,6 +1,8 @@
 //Test browser support
 const SUPPORTS_MEDIA_DEVICES = 'mediaDevices' in navigator;
 
+let torchOn = false;
+
 if (SUPPORTS_MEDIA_DEVICES) {
   //Get the environment camera (usually the second one)
   navigator.mediaDevices.enumerateDevices().then(devices => {
@@ -33,8 +35,9 @@ if (SUPPORTS_MEDIA_DEVICES) {
         //let there be light!
         const btn = document.querySelector('.switch');
         btn.addEventListener('click', function(){
+          torchOn = !torchOn;
           track.applyConstraints({
-            advanced: [{torch: true}]
+            advanced: [{torch: torchOn}]
           });
         });
       });
