@@ -1,82 +1,47 @@
-const canvas = document.getElementById("canvas");
-const captureBtn = document.getElementById("captureBtn");
-const switchBtn = document.getElementById("switchBtn");
-const gallerySection = document.getElementById("gallerySection");
-const galleryItems = document.getElementById("galleryItems");
-const generalPhoto = document.getElementById("generalPhoto");
+//Test browser support
+const SUPPORTS_MEDIA_DEVICES = 'mediaDevices' in navigator;
 
-let stream = null;
-const gallery = [];
-let currentFacingMode = "environment"; // Старт с задней камеры
-let ctx = canvas.getContext("2d");
+if (SUPPORTS_MEDIA_DEVICES) {
+  //Get the environment camera (usually the second one)
+  navigator.mediaDevices.enumerateDevices().then(devices => {
+  
+    const cameras = devices.filter((device) => device.kind === 'videoinput');
 
-const startCamera = async () => {
-  if (stream) {
-    stream.getTracks().forEach((track) => track.stop()); // Останавливаем предыдущий поток
-  }
-  console.log(stream);
-  console.log(currentFacingMode);
-  try {
-    stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: currentFacingMode },
-      audio: false,
+    if (cameras.length === 0) {
+      throw 'No camera found on this device.';
+    }
+    const camera = cameras[cameras.length - 1];
+
+    // Create stream and get video track
+    navigator.mediaDevices.getUserMedia({
+      video: {
+        deviceId: camera.deviceId,
+        facingMode: ['user', 'environment'],
+        height: {ideal: 1080},
+        width: {ideal: 1920}
+      }
+    }).then(stream => {
+      const track = stream.getVideoTracks()[0];
+      console.log(stream.getVideoTracks());
+
+      //Create image capture object and get camera capabilities
+      const imageCapture = new ImageCapture(track)
+      const photoCapabilities = imageCapture.getPhotoCapabilities().then(() => {
+
+        //todo: check if camera has a torch
+
+        //let there be light!
+        const btn = document.querySelector('.switch');
+        btn.addEventListener('click', function(){
+          track.applyConstraints({
+            advanced: [{torch: true}]
+          });
+        });
+      });
     });
-    const video = document.createElement("video");
-    video.srcObject = stream;
-    await video.play();
-
-    const drawVideo = () => {
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      requestAnimationFrame(drawVideo);
-    };
-
-    drawVideo();
-  } catch (error) {
-    console.error("Error accessing camera:", error);
-  }
-};
-
-const stopCamera = () => {
-  if (stream) {
-    stream.getTracks().forEach((track) => track.stop());
-  }
-};
-
-const setGeneralPhoto = (photoSrc) => {
-  generalPhoto.src = photoSrc;
-  generalPhoto.style.display = "block";
-};
-
-const capturePhoto = () => {
-  const dataUrl = canvas.toDataURL("image/jpeg");
-  gallery.push(dataUrl);
-  updateGallery();
-};
-
-const updateGallery = () => {
-  gallerySection.style.display = "flex";
-  galleryItems.innerHTML = "";
-
-  gallery.forEach((photo, index) => {
-    const img = document.createElement("img");
-    img.src = photo;
-    img.alt = `Gallery Item ${index + 1}`;
-    img.classList.add("gallery-item");
-    img.addEventListener("click", () => setGeneralPhoto(photo));
-    galleryItems.appendChild(img);
   });
-};
-
-switchBtn.addEventListener("click", () => {
-  currentFacingMode =
-    currentFacingMode === "environment" ? "user" : "environment";
-  console.log('switchBtn: ', currentFacingMode);
-  startCamera(); // Перезапуск камеры с новым facingMode
-});
-
-captureBtn.addEventListener("click", capturePhoto);
-
-window.addEventListener("DOMContentLoaded", startCamera);
-window.addEventListener("beforeunload", stopCamera);
+  
+  //The light will be on as long the track exists
+  
+  
+}
